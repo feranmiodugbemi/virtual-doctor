@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symptom Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .symptoms-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .symptom {
+            display: flex;
+            align-items: center;
+        }
+        .symptom input {
+            margin-right: 10px;
+        }
+        .others {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .others input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .confirmation {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+        }
+        .confirmation p {
+            margin: 10px 0;
+        }
+        .proceed-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            background-color: #28a745;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            text-align: center;
+            text-decoration: none;
+        }
+        .proceed-btn:hover {
+            background-color: #218838;
+        }
+        .local-language {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Nyocha mgbaàmà</h2>
+    <div class="symptoms-grid">
+        <label class="symptom"><input type="checkbox"> Ọrịa ọrịa</label>
+        <label class="symptom"><input type="checkbox"> Umeri</label>
+        <label class="symptom"><input type="checkbox"> Ọgụ</label>
+        <label class="symptom"><input type="checkbox"> Obi ịnya ọsọ</label>
+        <label class="symptom"><input type="checkbox"> Isi ọwụ</label>
+        <label class="symptom"><input type="checkbox"> Ike mgbaji na ike agwụ</label>
+        <label class="symptom"><input type="checkbox"> Ọgbụgbọ na ịpụ afọ</label>
+        <label class="symptom"><input type="checkbox"> Akpụkpụ ahụ</label>
+        <label class="symptom"><input type="checkbox"> Isi ike na mkpịsị aka</label>
+        <label class="symptom"><input type="checkbox"> Ọrịa afọ</label>
+        <label class="symptom"><input type="checkbox"> Ọrịa afọ</label>
+        <label class="symptom"><input type="checkbox"> Agha</label>
+        <label class="symptom"><input type="checkbox"> Ọkpụkpụ na mgbu akwara</label>
+    </div>
+    <div class="others">
+        <input type="text" placeholder="Ndụ ọzọ, kewara site na mkpụrụ(e.g Ọkọchị, ọrịa)">
+    </div>
+
+    <div class="confirmation">
+        <a href="#" class="proceed-btn">Gaa n'ihu</a>
+    </div>
+    <p class="local-language">Select the symptoms you're exhibiting</p>
+</div>
+
+</body>
+</html>

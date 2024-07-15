@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Symptom Checker</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+.container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.symptoms-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.symptom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    height: 100px;
+    position: relative;
+    overflow: hidden;
+}
+.symptom img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.symptom input {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    z-index: 2;
+}
+.confirmation {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+}
+.confirmation p {
+    margin: 10px 0;
+}
+.proceed-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background-color: #28a745;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+}
+.proceed-btn:hover {
+    background-color: #218838;
+}
+.local-language {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 12px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h2>Symptom Checker</h2>
+<div class="symptoms-grid">
+    <div class="symptom"><img src="../static/Symptoms images/Loss of appetite.jpg" alt="Loss of appetite"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Joint pain.jpg" alt="Joint pain"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Chest pain.jpg" alt="Chest pain"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Nausea and vomiting.jpg" alt="Nausea and vomiting"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Weakness.jpg" alt="Weakness"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Cold.jpg" alt="Cold"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Fever.jpg" alt="Fever"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Dizziness.jpg" alt="Dizziness"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Headache.jpg" alt="Headache"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Rashes.jpg" alt="Rashes"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Sore throat.jpg" alt="Sore throat"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Diarrhea.jpg" alt="Diarrhea"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Stomach pain.jpg" alt="Stomach pain"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Shortness of breath.jpg" alt="Shortness of breath"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Cough.jpg" alt="Cough"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Blurry vision.jpg" alt="Blurry vision"><input type="checkbox"></div>
+</div>
+<div class="confirmation">
+<a href="#" class="proceed-btn">Proceed</a>
+</div>
+<p class="local-language">Họrọ foto ndị dị n'elu nke metụtara ọrịa gị</p>
+</div>
+</body>
+</html>

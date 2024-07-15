@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnosis Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .diagnosis {
+            padding: 20px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            background-color: #e9ecef;
+        }
+        .diagnosis p {
+            margin: 10px 0;
+        }
+        .full-report-btn {
+            padding: 10px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            text-align: center;
+            display: block;
+            margin: 20px auto 0 auto;
+            width: 150px;
+        }
+        .full-report-btn:hover {
+            background-color: #0056b3;
+        }
+        .chart-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .explanation {
+            padding: 20px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            background-color: #e9ecef;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="diagnosis">
+            <p><strong>Nchọpụta mbụ:</strong> Ọrịa iba</p>
+            <p><strong>Ọgwụgwọ:</strong> Tebụlị Anti-Iba dịka coartem, lonarts wdg.</p>
+            <p><strong>Nkwado:</strong> Bido ọgwụ ozugbo, ọ bụrụ na enweghị ihe ọhụụ mgbe ụbọchị abụọ gasịrị, gaa n'ụlọ nyocha maka nyocha zuru ezu.</p>
+            <button class="full-report-btn">Akụkọ zuru ezu</button>
+        </div>
+    
+        <div class="chart-container">
+            <h3>Akụkọ Nchọpụta/Ọgwụgwọ</h3>
+            <canvas id="diagnosisChart"></canvas>
+        </div>
+    
+        <div class="explanation">
+            <h4>Nkọwa:</h4>
+            <p>Nchọpụta a dabere na atụnyere mgbaàmà ndị ọrịa, na mgbaàmà ndị dị na ndọtị data anyị, wee nyochaa ya megide nchọpụta ahụike gara aga nke ndị ọrịa nwere mgbaàmà yiri nke a, nwoke na afọ otu.</p>
+        </div>
+    </div>
+    
+
+<script>
+    const ctx = document.getElementById('diagnosisChart').getContext('2d');
+
+    // Gradient Fill
+    const gradientMalaria = ctx.createLinearGradient(0, 0, 0, 400);
+    gradientMalaria.addColorStop(0, 'rgba(255, 99, 132, 0.8)');
+    gradientMalaria.addColorStop(1, 'rgba(255, 99, 132, 0.2)');
+
+    const gradientDengue = ctx.createLinearGradient(0, 0, 0, 400);
+    gradientDengue.addColorStop(0, 'rgba(54, 162, 235, 0.8)');
+    gradientDengue.addColorStop(1, 'rgba(54, 162, 235, 0.2)');
+
+    const gradientCold = ctx.createLinearGradient(0, 0, 0, 400);
+    gradientCold.addColorStop(0, 'rgba(75, 192, 192, 0.8)');
+    gradientCold.addColorStop(1, 'rgba(75, 192, 192, 0.2)');
+
+    const diagnosisChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Ọrịa iba', 'Ọrịa dengue', 'Ọkụkọ na ọnya oyi'],
+            datasets: [{
+                label: 'Iwu Ụzọ Ọrịa (%)',
+                data: [70, 20, 10],
+                backgroundColor: [
+                    gradientMalaria,
+                    gradientDengue,
+                    gradientCold
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ],
+                borderWidth: 1,
+                hoverBackgroundColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            return tooltipItem.label + ': ' + tooltipItem.raw + '%';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

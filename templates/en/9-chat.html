@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctor Conversation</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+.container {
+    max-width: 1000px;
+    margin: auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: flex-start;
+}
+.doctor {
+    width: 300px;
+    height: 300px;
+    margin-right: 20px;
+}
+.dialogue {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex-grow: 1;
+}
+.speech-bubble {
+    position: relative;
+    background: #f1f1f1;
+    border-radius: .4em;
+    padding: 10px;
+    margin-bottom: 20px;
+    max-width: 60%;
+}
+.speech-bubble:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-left-color: #f1f1f1;
+    border-right: 0;
+    margin-top: -10px;
+    margin-left: -10px;
+}
+.patient-response {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    margin-bottom: 20px;
+}
+.patient-bubble {
+    position: relative;
+    background: #e0f7fa;
+    border-radius: .4em;
+    padding: 10px;
+    margin-left: 20px;
+    max-width: 60%;
+}
+.patient-bubble:before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-right-color: #e0f7fa;
+    border-left: 0;
+    margin-top: -10px;
+    margin-right: -10px;
+}
+.patient-name {
+    margin-left: 10px;
+    font-weight: bold;
+}
+#message-input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+#send-button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+#send-button:hover {
+    background-color: #0056b3;
+}
+#loading {
+    margin-top: 10px;
+}
+</style>
+<script type="importmap">
+  { "imports":
+    {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js/+esm",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/",
+      "talkinghead": "https://cdn.jsdelivr.net/gh/met4citizen/TalkingHead@1.2/modules/talkinghead.mjs"
+    }
+  }
+</script>
+</head>
+<body>
+<div class="container">
+    <div id="avatar" class="doctor"></div>
+    <div class="dialogue">
+        <div id="loading"></div>
+        <div class="speech-bubble">
+            Are you okay with your diagnosis and proposed treatment?
+        </div>
+        <div class="patient-response">
+            <div class="patient-bubble">
+                Yes, Doctor. Thank you.
+            </div>
+            <div class="patient-name">Luminous</div>
+        </div>
+        <div class="speech-bubble">
+            Is there any other thing I can help you with?
+        </div>
+        <div class="patient-response">
+            <div class="patient-bubble">
+                No!
+            </div>
+            <div class="patient-name">Luminous</div>
+        </div>
+        <div class="speech-bubble">
+            Have a great day! Quick recovery.
+        </div>
+        <div class="patient-response">
+            <div class="patient-bubble">
+                Have a great day.
+            </div>
+            <div class="patient-name">Luminous</div>
+        </div>
+        <input type="text" id="message-input" placeholder="Type your message...">
+        <button id="send-button">Send</button>
+    </div>
+</div>
+<script type="module">
+    import { TalkingHead } from "talkinghead";
+    let head;
+    document.addEventListener('DOMContentLoaded', async function(e) {
+      const nodeAvatar = document.getElementById('avatar');
+      head = new TalkingHead( nodeAvatar, {
+        ttsEndpoint: "https://eu-texttospeech.googleapis.com/v1beta1/text:synthesize",
+        ttsApikey: "put-your-own-Google-TTS-API-key-here", // <- Change this
+        lipsyncModules: ["en", "fi"],
+        cameraView: "upper"
+      });
+      const nodeLoading = document.getElementById('loading');
+      try {
+        nodeLoading.textContent = "Loading...";
+        await head.showAvatar( {
+          url: 'https://models.readyplayer.me/6685cdb9539979578e51c626.glb',
+          body: 'F',
+          avatarMood: 'neutral',
+          ttsLang: "en-GB",
+          ttsVoice: "en-GB-Standard-A",
+          lipsyncLang: 'en'
+        }, (ev) => {
+          if ( ev.lengthComputable ) {
+            let val = Math.min(100,Math.round(ev.loaded/ev.total * 100 ));
+            nodeLoading.textContent = "Loading " + val + "%";
+          }
+        });
+        nodeLoading.style.display = 'none';
+      } catch (error) {
+        console.log(error);
+        nodeLoading.textContent = error.toString();
+      }
+
+      const sendButton = document.getElementById('send-button');
+      const messageInput = document.getElementById('message-input');
+      const dialogue = document.querySelector('.dialogue');
+
+      sendButton.addEventListener('click', function() {
+        const message = messageInput.value.trim();
+        if (message) {
+          const patientResponse = document.createElement('div');
+          patientResponse.className = 'patient-response';
+          patientResponse.innerHTML = `
+            <div class="patient-bubble">${message}</div>
+            <div class="patient-name">Luminous</div>
+          `;
+          dialogue.insertBefore(patientResponse, messageInput);
+          messageInput.value = '';
+          
+          // You can add logic here to generate a doctor's response
+          // For now, let's just make the avatar speak the patient's message
+          head.speakText(message);
+        }
+      });
+    });
+</script>
+</body>
+</html>

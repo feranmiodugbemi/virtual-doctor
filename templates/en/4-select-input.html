@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rapid Kure Prompts</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f8ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.container {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    max-width: 600px;
+    width: 100%;
+}
+.avatar-container {
+    width: 200px;
+    height: 200px;
+}
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+.speech-bubble {
+    background-color: #e6f3ff;
+    border-radius: 20px;
+    padding: 15px;
+    margin-bottom: 20px;
+    position: relative;
+    max-width: 100%;
+    text-align: center;
+}
+.button {
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    margin: 5px 0;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.button:hover {
+    background-color: #e0e0e0;
+}
+#loading {
+    text-align: center;
+    margin-top: 10px;
+}
+
+@media (min-width: 768px) {
+    .container {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+    .content {
+        align-items: flex-start;
+    }
+    .speech-bubble {
+        text-align: left;
+    }
+    .speech-bubble::after {
+        content: '';
+        position: absolute;
+        left: -15px;
+        top: 50%;
+        border-width: 15px 15px 15px 0;
+        border-style: solid;
+        border-color: transparent #e6f3ff transparent transparent;
+    }
+}
+</style>
+<script type="importmap">
+  { "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js/+esm",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/",
+    "talkinghead": "https://cdn.jsdelivr.net/gh/met4citizen/TalkingHead@1.2/modules/talkinghead.mjs"
+  } }
+</script>
+</head>
+<body>
+<div class="container">
+    <div id="avatar" class="avatar-container"></div>
+    <div class="content">
+        <div class="speech-bubble">
+            select your preferred input format to query LLM
+        </div>
+        <button class="button">Text Input</button>
+        <button class="button">Image Input</button>
+        <button class="button">Direct Scan Input</button>
+    </div>
+</div>
+<div id="loading"></div>
+<script type="module">
+    import { TalkingHead } from "talkinghead";
+    let head;
+    document.addEventListener('DOMContentLoaded', async function(e) {
+      const nodeAvatar = document.getElementById('avatar');
+      head = new TalkingHead( nodeAvatar, {
+        ttsEndpoint: "https://eu-texttospeech.googleapis.com/v1beta1/text:synthesize",
+        ttsApikey: "put-your-own-Google-TTS-API-key-here", // <- Change this
+        lipsyncModules: ["en", "fi"],
+        cameraView: "upper"
+      });
+      const nodeLoading = document.getElementById('loading');
+      try {
+        nodeLoading.textContent = "Loading...";
+        await head.showAvatar( {
+          url: 'https://models.readyplayer.me/6685cdb9539979578e51c626.glb',
+          body: 'F',
+          avatarMood: 'neutral',
+          ttsLang: "en-GB",
+          ttsVoice: "en-GB-Standard-A",
+          lipsyncLang: 'en'
+        }, (ev) => {
+          if ( ev.lengthComputable ) {
+            let val = Math.min(100,Math.round(ev.loaded/ev.total * 100 ));
+            nodeLoading.textContent = "Loading " + val + "%";
+          }
+        });
+        nodeLoading.style.display = 'none';
+        const content = document.querySelector('.speech-bubble').textContent.trim();
+        head.speakText(content);
+      } catch (error) {
+        console.log(error);
+        nodeLoading.textContent = error.toString();
+      }
+
+      // Add click events to make avatar speak button text
+      document.querySelectorAll('.button').forEach((button) => {
+        button.addEventListener('click', () => {
+          head.speakText(button.textContent);
+        });
+      });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat Interface</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+.chat-container {
+    max-width: 800px;
+    width: 100%;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+.message {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    flex-direction: column;
+}
+#avatar {
+    width: 200px;
+    height: 200px;
+    margin-bottom: 10px;
+    align-self: center;
+}
+.message .content {
+    background-color: #f1f1f1;
+    border-radius: 10px;
+    padding: 10px 15px;
+    position: relative;
+    max-width: 100%;
+    margin-top: 10px;
+}
+.message .content::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-bottom-color: #f1f1f1;
+    border-top: 0;
+}
+.message.patient .content {
+    background-color: #e0f7fa;
+}
+.message.patient .content::after {
+    border-bottom-color: #e0f7fa;
+}
+.chat-footer {
+    padding: 10px;
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.button-group button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.button-group .proceed {
+    background-color: #4CAF50;
+    color: white;
+}
+.button-group .exit {
+    background-color: #f44336;
+    color: white;
+}
+.footer-text {
+    text-align: center;
+    margin-top: 20px;
+    color: #777;
+}
+#loading {
+    text-align: center;
+    margin-top: 10px;
+}
+
+@media (min-width: 768px) {
+    .message {
+        flex-direction: row;
+    }
+    #avatar {
+        margin-right: 20px;
+        margin-bottom: 0;
+        align-self: flex-start;
+    }
+    .message .content {
+        max-width: calc(100% - 220px);
+    }
+    .message .content::after {
+        top: 20px;
+        left: -10px;
+        border: 10px solid transparent;
+        border-right-color: #f1f1f1;
+        border-left: 0;
+    }
+    .chat-footer {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    .button-group {
+        margin-top: 0;
+    }
+}
+</style>
+<script type="importmap">
+  { "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js/+esm",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/",
+    "talkinghead": "https://cdn.jsdelivr.net/gh/met4citizen/TalkingHead@1.2/modules/talkinghead.mjs"
+  } }
+</script>
+</head>
+<body>
+<div class="chat-container">
+    <div class="message doctor">
+        <div id="avatar"></div>
+        <div id="loading"></div>
+        <div class="content">
+            Hi Luminous, my name is Dr. Tuesday - A trained health assistant. I will be asking you a few questions and possibly taking a scanned image of your face or symptom's physical manifestation of your health challenge, to help get you the most suitable diagnosis and treatment for your medical needs. Do you give your consent to proceed?
+        </div>
+    </div>
+    <div class="chat-footer">
+        <div class="button-group">
+            <button class="proceed">Yes, Proceed</button>
+            <button class="exit">No, Exit</button>
+        </div>
+        <div class="footer-text">
+            Subtitled translation in local language - Igbo
+        </div>
+    </div>
+</div>
+<script type="module">
+    import { TalkingHead } from "talkinghead";
+    let head;
+    document.addEventListener('DOMContentLoaded', async function(e) {
+      const nodeAvatar = document.getElementById('avatar');
+      head = new TalkingHead( nodeAvatar, {
+        ttsEndpoint: "https://eu-texttospeech.googleapis.com/v1beta1/text:synthesize",
+        ttsApikey: "put-your-own-Google-TTS-API-key-here", // <- Change this
+        lipsyncModules: ["en", "fi"],
+        cameraView: "upper"
+      });
+      const nodeLoading = document.getElementById('loading');
+      try {
+        nodeLoading.textContent = "Loading...";
+        await head.showAvatar( {
+          url: 'https://models.readyplayer.me/6685cdb9539979578e51c626.glb',
+          body: 'F',
+          avatarMood: 'neutral',
+          ttsLang: "en-GB",
+          ttsVoice: "en-GB-Standard-A",
+          lipsyncLang: 'en'
+        }, (ev) => {
+          if ( ev.lengthComputable ) {
+            let val = Math.min(100,Math.round(ev.loaded/ev.total * 100 ));
+            nodeLoading.textContent = "Loading " + val + "%";
+          }
+        });
+        nodeLoading.style.display = 'none';
+        const content = document.querySelector('.content').textContent.trim();
+        head.speakText(content);
+      } catch (error) {
+        console.log(error);
+        nodeLoading.textContent = error.toString();
+      }
+    });
+</script>
+</body>
+</html>

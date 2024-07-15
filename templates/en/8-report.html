@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnosis Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .diagnosis {
+            padding: 20px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            background-color: #e9ecef;
+        }
+        .diagnosis p {
+            margin: 10px 0;
+        }
+        .full-report-btn {
+            padding: 10px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            text-align: center;
+            display: block;
+            margin: 20px auto 0 auto;
+            width: 150px;
+        }
+        .full-report-btn:hover {
+            background-color: #0056b3;
+        }
+        .chart-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .explanation {
+            padding: 20px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            background-color: #e9ecef;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <div class="diagnosis">
+        <p><strong>Primary Diagnosis:</strong> Malaria</p>
+        <p><strong>Treatment:</strong> Anti-Malaria tablets such as coartem, lonarts etc.</p>
+        <p><strong>Recommendation:</strong> Start medication immediately, if no visible result after 2 days, visit a lab for full body screening.</p>
+        <button class="full-report-btn">Full Report</button>
+    </div>
+
+    <div class="chart-container">
+        <h3>Diagnosis Report/Treatment</h3>
+        <canvas id="diagnosisChart"></canvas>
+    </div>
+
+    <div class="explanation">
+        <h4>Explanation:</h4>
+        <p>The diagnosis was based on comparison on the patients symptoms, with already existing symptoms in our dataset, and then evaluated against past medical diagnosis of patients with the same symptoms, gender and age group.</p>
+    </div>
+</div>
+
+<script>
+    const ctx = document.getElementById('diagnosisChart').getContext('2d');
+
+    // Gradient Fill
+    const gradientMalaria = ctx.createLinearGradient(0, 0, 0, 400);
+    gradientMalaria.addColorStop(0, 'rgba(255, 99, 132, 0.8)');
+    gradientMalaria.addColorStop(1, 'rgba(255, 99, 132, 0.2)');
+
+    const gradientDengue = ctx.createLinearGradient(0, 0, 0, 400);
+    gradientDengue.addColorStop(0, 'rgba(54, 162, 235, 0.8)');
+    gradientDengue.addColorStop(1, 'rgba(54, 162, 235, 0.2)');
+
+    const gradientCold = ctx.createLinearGradient(0, 0, 0, 400);
+    gradientCold.addColorStop(0, 'rgba(75, 192, 192, 0.8)');
+    gradientCold.addColorStop(1, 'rgba(75, 192, 192, 0.2)');
+
+    const diagnosisChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Malaria', 'Dengue Fever', 'Common Cold'],
+            datasets: [{
+                label: 'Probability of Diseases (%)',
+                data: [70, 20, 10],
+                backgroundColor: [
+                    gradientMalaria,
+                    gradientDengue,
+                    gradientCold
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ],
+                borderWidth: 1,
+                hoverBackgroundColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            return tooltipItem.label + ': ' + tooltipItem.raw + '%';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

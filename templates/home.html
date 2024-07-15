@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rapid Kure</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+.container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+#avatar {
+    width: 300px;
+    height: 300px;
+    margin: 20px auto;
+}
+.speech-bubble {
+    position: relative;
+    background: #f1f1f1;
+    border-radius: .4em;
+    padding: 20px;
+    margin-bottom: 20px;
+    display: inline-block;
+}
+.speech-bubble:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-left-color: #f1f1f1;
+    border-right: 0;
+    margin-top: -10px;
+    margin-left: -10px;
+}
+.input-group {
+    margin: 20px 0;
+    text-align: left;
+}
+.input-group label {
+    margin-right: 10px;
+    font-weight: bold;
+}
+.input-group input {
+    padding: 5px;
+    font-size: 16px;
+    width: calc(100% - 100px);
+}
+.btn-group {
+    margin: 20px 0;
+}
+.btn-group button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: #fff;
+}
+.btn-group button:hover {
+    background-color: #0056b3;
+}
+.subtitle {
+    font-size: 14px;
+    color: #666;
+}
+#loading {
+    margin-top: 10px;
+}
+#text {
+    width: 100%;
+    margin-top: 10px;
+}
+#speak {
+    margin-top: 10px;
+}
+</style>
+<script type="importmap">
+  { "imports":
+    {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js/+esm",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/",
+      "talkinghead": "https://cdn.jsdelivr.net/gh/met4citizen/TalkingHead@1.2/modules/talkinghead.mjs"
+    }
+  }
+</script>
+</head>
+<body>
+<div class="container">
+    <div id="avatar"></div>
+    <div id="loading"></div>
+    <div class="speech-bubble">
+        Hello Esteemed patient, Welcome to Rapid Kure. Please state your name and click or say your preferred language to proceed!
+    </div>
+    <div class="input-group">
+        <label for="preferred-name">Preferred Name:</label>
+        <input type="text" id="preferred-name" value="Luminous">
+    </div>
+    <div class="btn-group">
+        <button>English Language</button>
+        <button>Igbo Language</button>
+    </div>
+    <div class="subtitle">Subtitled translation in local language - Igbo</div>
+</div>
+<script type="module">
+    import { TalkingHead } from "talkinghead";
+    let head;
+    document.addEventListener('DOMContentLoaded', async function(e) {
+      const nodeAvatar = document.getElementById('avatar');
+      head = new TalkingHead( nodeAvatar, {
+        ttsEndpoint: "https://eu-texttospeech.googleapis.com/v1beta1/text:synthesize",
+        ttsApikey: "put-your-own-Google-TTS-API-key-here", // <- Change this
+        lipsyncModules: ["en", "fi"],
+        cameraView: "upper"
+      });
+      const nodeLoading = document.getElementById('loading');
+      try {
+        nodeLoading.textContent = "Loading...";
+        await head.showAvatar( {
+          url: 'https://models.readyplayer.me/6685cdb9539979578e51c626.glb?morphTargets=ARKit,Oculus+Visemes,mouthOpen,mouthSmile,eyesClosed,eyesLookUp,eyesLookDown&textureSizeLimit=1024&textureFormat=png',
+          body: 'F',
+          avatarMood: 'neutral',
+          ttsLang: "en-GB",
+          ttsVoice: "en-GB-Standard-A",
+          lipsyncLang: 'en'
+        }, (ev) => {
+          if ( ev.lengthComputable ) {
+            let val = Math.min(100,Math.round(ev.loaded/ev.total * 100 ));
+            nodeLoading.textContent = "Loading " + val + "%";
+          }
+        });
+        nodeLoading.style.display = 'none';
+      } catch (error) {
+        console.log(error);
+        nodeLoading.textContent = error.toString();
+      }
+    });
+</script>
+</body>
+</html>
