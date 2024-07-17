@@ -1,167 +1,260 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LLM Medical Assistant Selection</title>
-<style>
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f8ff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    padding: 20px;
-    box-sizing: border-box;
-}
-.container {
-    background-color: white;
-    border-radius: 15px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.1);
-    padding: 30px;
-    text-align: center;
-    max-width: 800px;
-    width: 100%;
-}
-h1 {
-    color: #333;
-    margin-bottom: 30px;
-    font-size: 24px;
-}
-.assistants {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-}
-.assistant {
-    background-color: #e6f3ff;
-    border-radius: 10px;
-    padding: 20px;
-    transition: transform 0.3s ease;
-}
-.assistant:hover {
-    transform: scale(1.05);
-}
-.avatar {
-    width: 200px;
-    height: 200px;
-    margin: 0 auto 15px;
-}
-.assistant h2 {
-    color: #2c3e50;
-    margin: 10px 0;
-}
-.assistant p {
-    color: #34495e;
-    font-style: italic;
-}
-.subtitle {
-    margin-top: 20px;
-    color: #7f8c8d;
-    font-style: italic;
-}
-#loading {
-    text-align: center;
-    margin-top: 10px;
-}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LLM Medical Assistant Selection</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f8ff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+      .container {
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        text-align: center;
+        max-width: 800px;
+        width: 100%;
+      }
+      h1 {
+        color: #333;
+        margin-bottom: 30px;
+        font-size: 24px;
+      }
+      .assistants {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+      }
+      .assistant {
+        background-color: #e6f3ff;
+        border-radius: 10px;
+        padding: 20px;
+        transition: transform 0.3s ease;
+      }
+      .assistant:hover {
+        transform: scale(1.05);
+      }
+      .avatar {
+        width: 200px;
+        height: 200px;
+        margin: 0 auto 15px;
+      }
+      .assistant h2 {
+        color: #2c3e50;
+        margin: 10px 0;
+      }
+      .assistant p {
+        color: #34495e;
+        font-style: italic;
+      }
+      .subtitle {
+        margin-top: 20px;
+        color: #7f8c8d;
+        font-style: italic;
+      }
+      #loading {
+        text-align: center;
+        margin-top: 10px;
+      }
 
-@media (min-width: 768px) {
-    .assistants {
-        flex-direction: row;
-        justify-content: space-around;
-    }
-    .assistant {
-        width: 45%;
-    }
-    h1 {
-        font-size: 28px;
-    }
-}
-</style>
-<script type="importmap">
-  { "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js/+esm",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/",
-    "talkinghead": "https://cdn.jsdelivr.net/gh/met4citizen/TalkingHead@1.2/modules/talkinghead.mjs"
-  } }
-</script>
-</head>
-<body>
-<div class="container">
-    <h1>Please select your preferred LLM medical assistant</h1>
-    <div class="assistants">
-        <div class="assistant">
-            <div id="avatar1" class="avatar"></div>
-            <h2>Dr Tuesday Kure</h2>
-            <p>"Hi Luminous, please call me Doctor K."</p>
+      @media (min-width: 768px) {
+        .assistants {
+          flex-direction: row;
+          justify-content: space-around;
+        }
+        .assistant {
+          width: 45%;
+        }
+        h1 {
+          font-size: 28px;
+        }
+      }
+      .assistant.selected {
+        background-color: #b3d9ff;
+        border: 2px solid #3399ff;
+      }
+      .continue-button {
+        display: none;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #3399ff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      .continue-button svg {
+        margin-left: 10px;
+        vertical-align: middle;
+      }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js/+esm",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/",
+          "talkinghead": "https://cdn.jsdelivr.net/gh/met4citizen/TalkingHead@1.2/modules/talkinghead.mjs"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Please select your preferred LLM medical assistant</h1>
+      <div class="assistants">
+        <div class="assistant" data-gender="female">
+          <div id="avatar1" class="avatar"></div>
+          <h2>Dr Tuesday Kure</h2>
+          <p>"Hi {{name}}, please call me Doctor T."</p>
         </div>
-        <div class="assistant">
-            <div id="avatar2" class="avatar"></div>
-            <h2>Dr Sunday Kure</h2>
-            <p>"Hi Luminous, please call me Doctor K."</p>
+        <div class="assistant" data-gender="male">
+          <div id="avatar2" class="avatar"></div>
+          <h2>Dr Sunday Kure</h2>
+          <p>"Hi {{name}}, please call me Doctor Sunny."</p>
         </div>
+      </div>
+      <div id="loading"></div>
+      <button id="continueButton" class="continue-button">
+        Continue
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>
+      <p class="subtitle">Subtitled translation in local language - Igbo</p>
     </div>
-    <div id="loading"></div>
-    <p class="subtitle">Subtitled translation in local language - Igbo</p>
-</div>
-<script type="module">
-    import { TalkingHead } from "talkinghead";
-    let head1, head2;
+    <script type="module">
+      import { TalkingHead } from "talkinghead";
+      let head1, head2;
 
-    async function createAvatar(nodeId, url) {
+      async function createAvatar(nodeId, url, voice, body) {
         const nodeAvatar = document.getElementById(nodeId);
         const head = new TalkingHead(nodeAvatar, {
-            ttsEndpoint: "https://eu-texttospeech.googleapis.com/v1beta1/text:synthesize",
-            ttsApikey: "put-your-own-Google-TTS-API-key-here", // <- Change this
-            lipsyncModules: ["en", "fi"],
-            cameraView: "upper"
+          ttsEndpoint:
+            "https://eu-texttospeech.googleapis.com/v1beta1/text:synthesize",
+          ttsApikey: "AIzaSyAWtezgKPFuyP45SX0ZyO7ZGRHjLePr2hE", // <- Change this
+          lipsyncModules: ["en", "fi"],
+          cameraView: "upper",
         });
 
-        const nodeLoading = document.getElementById('loading');
+        const nodeLoading = document.getElementById("loading");
         try {
-            nodeLoading.textContent = `Loading ${nodeId}...`;
-            await head.showAvatar({
-                url: url,
-                body: 'F',
-                avatarMood: 'neutral',
-                ttsLang: "en-GB",
-                ttsVoice: "en-GB-Standard-A",
-                lipsyncLang: 'en'
-            }, (ev) => {
-                if (ev.lengthComputable) {
-                    let val = Math.min(100, Math.round(ev.loaded / ev.total * 100));
-                    nodeLoading.textContent = `Loading ${nodeId}: ${val}%`;
-                }
-            });
-            return head;
+          nodeLoading.textContent = `Loading ${nodeId}...`;
+          await head.showAvatar(
+            {
+              url: url,
+              body: body,
+              avatarMood: "neutral",
+              ttsLang: "en-GB",
+              ttsVoice: voice,
+              lipsyncLang: "en",
+            },
+            (ev) => {
+              if (ev.lengthComputable) {
+                let val = Math.min(
+                  100,
+                  Math.round((ev.loaded / ev.total) * 100)
+                );
+                nodeLoading.textContent = `Loading ${nodeId}: ${val}%`;
+              }
+            }
+          );
+          return head;
         } catch (error) {
-            console.log(error);
-            nodeLoading.textContent = error.toString();
+          console.log(error);
+          nodeLoading.textContent = error.toString();
         }
-    }
+      }
 
-    document.addEventListener('DOMContentLoaded', async function(e) {
-        const nodeLoading = document.getElementById('loading');
-        
-        head1 = await createAvatar('avatar1', 'https://models.readyplayer.me/6685cdb9539979578e51c626.glb');
-        head2 = await createAvatar('avatar2', 'https://models.readyplayer.me/66841b4f3a3799e2f94177e8.glb');
+      document.addEventListener("DOMContentLoaded", async function (e) {
+        const nodeLoading = document.getElementById("loading");
 
-        nodeLoading.style.display = 'none';
+        head1 = await createAvatar(
+          "avatar1",
+          "https://models.readyplayer.me/6685cdb9539979578e51c626.glb?morphTargets=ARKit,Oculus+Visemes,mouthOpen,mouthSmile,eyesClosed,eyesLookUp,eyesLookDown&textureSizeLimit=1024&textureFormat=png",
+          "en-GB-Standard-A",
+          "F"
+        );
+        head2 = await createAvatar(
+          "avatar2",
+          "https://models.readyplayer.me/66841b4f3a3799e2f94177e8.glb?morphTargets=ARKit,Oculus+Visemes,mouthOpen,mouthSmile,eyesClosed,eyesLookUp,eyesLookDown&textureSizeLimit=1024&textureFormat=png",
+          "en-GB-Standard-B",
+          "M"
+        );
 
-        // Add click events to make avatars speak
-        document.querySelectorAll('.assistant').forEach((assistant, index) => {
-            assistant.addEventListener('click', () => {
-                const text = assistant.querySelector('p').textContent;
-                if (index === 0) {
-                    head1.speakText(text);
-                } else {
-                    head2.speakText(text);
-                }
-            });
+        nodeLoading.style.display = "none";
+        // Add click event listeners to the assistants
+        const assistants = document.querySelectorAll(".assistant");
+        const continueButton = document.getElementById("continueButton");
+        let selectedGender = null;
+        assistants.forEach((assistant) => {
+          assistant.addEventListener("click", () => {
+            assistants.forEach((a) => a.classList.remove("selected"));
+            assistant.classList.add("selected");
+            selectedGender = assistant.dataset.gender;
+            continueButton.style.display = "inline-block";
+          });
         });
-    });
-</script>
-</body>
+
+        async function sendData(assistant) {
+          const url = "/api/assistant"; // Replace with your actual API endpoint
+          const data = { assistant: assistant };
+          try {
+            const response = await fetch(url, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data),
+            });
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const result = await response.json();
+            console.log("Success:", result);
+            window.location.href = "/en/select-input";
+            return result;
+          } catch (error) {
+            console.error("Error:", error);
+            alert(error);
+            throw error;
+          }
+        }
+
+        // Add click event listener to the continue button
+        continueButton.addEventListener("click", async () => {
+          if (selectedGender) {
+            try {
+              await sendData(selectedGender);
+            } catch (error) {
+              alert(error);
+            }
+          } else {
+            alert("Please select an assistant before continuing.");
+          }
+        });
+      });
+    </script>
+  </body>
 </html>

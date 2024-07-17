@@ -28,22 +28,6 @@
         .diagnosis p {
             margin: 10px 0;
         }
-        .full-report-btn {
-            padding: 10px;
-            border: none;
-            background-color: #007bff;
-            color: #fff;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
-            text-align: center;
-            display: block;
-            margin: 20px auto 0 auto;
-            width: 150px;
-        }
-        .full-report-btn:hover {
-            background-color: #0056b3;
-        }
         .chart-container {
             text-align: center;
             margin-bottom: 20px;
@@ -61,10 +45,11 @@
 
 <div class="container">
     <div class="diagnosis">
-        <p><strong>Primary Diagnosis:</strong> Malaria</p>
-        <p><strong>Treatment:</strong> Anti-Malaria tablets such as coartem, lonarts etc.</p>
+        <p id="disease2" style="display: none;">{{disease2}}</p>
+        <p id="disease3" style="display: none;">{{disease3}}</p>
+        <p id="disease1"><strong>Primary Diagnosis:</strong> {{disease1}}</p>
+        <p><strong>Treatment:</strong> {{treatment}}</p>
         <p><strong>Recommendation:</strong> Start medication immediately, if no visible result after 2 days, visit a lab for full body screening.</p>
-        <button class="full-report-btn">Full Report</button>
     </div>
 
     <div class="chart-container">
@@ -80,7 +65,9 @@
 
 <script>
     const ctx = document.getElementById('diagnosisChart').getContext('2d');
-
+    const disease1 = document.getElementById("disease1").textContent;
+    const disease2 = document.getElementById("disease2").textContent;
+    const disease3 = document.getElementById("disease3").textContent;
     // Gradient Fill
     const gradientMalaria = ctx.createLinearGradient(0, 0, 0, 400);
     gradientMalaria.addColorStop(0, 'rgba(255, 99, 132, 0.8)');
@@ -97,7 +84,7 @@
     const diagnosisChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Malaria', 'Dengue Fever', 'Common Cold'],
+            labels: [disease1, disease2, disease3],
             datasets: [{
                 label: 'Probability of Diseases (%)',
                 data: [70, 20, 10],

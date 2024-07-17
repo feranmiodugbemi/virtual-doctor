@@ -76,6 +76,40 @@
             margin-top: 10px;
             font-size: 12px;
         }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+            border-radius: 5px;
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -101,10 +135,70 @@
         <input type="text" placeholder="Others, separated with a comma(e.g Cold, fever)">
     </div>
     <div class="confirmation">
-        <a href="#" class="proceed-btn">Proceed</a>
+        <a href="#" class="proceed-btn" onclick="logSymptoms()">Proceed</a>
     </div>
     <p class="local-language">Họrọ ederede ndị dị n'elu nke metụtara ọrịa gị</p>
 </div>
 
+<!-- Modal -->
+<div id="loadingModal" class="modal">
+    <div class="modal-content">
+        <div class="loader"></div>
+        <p>Processing your symptoms...</p>
+    </div>
+</div>
+
+<script>
+    function logSymptoms() {
+        const checkboxes = document.querySelectorAll('.symptom input[type="checkbox"]:checked');
+        const otherSymptoms = document.querySelector('.others input').value.trim();
+        
+        let symptoms = Array.from(checkboxes).map(checkbox => checkbox.parentNode.textContent.trim());
+        
+        if (otherSymptoms) {
+            symptoms = symptoms.concat(otherSymptoms.split(',').map(symptom => symptom.trim()));
+        }
+        
+        const result = symptoms.join(', ');
+        console.log(result);
+        makeDiagnosisRequest(result);
+    }
+
+    function showLoadingModal() {
+        document.getElementById('loadingModal').style.display = 'block';
+    }
+
+    function hideLoadingModal() {
+        document.getElementById('loadingModal').style.display = 'none';
+    }
+
+    function makeDiagnosisRequest(symptoms) {
+        const language = 'en'; // You can change this or make it dynamic based on user selection
+
+        showLoadingModal(); // Show the loading modal
+
+        fetch('/api/diagnosis', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                symptoms: symptoms,
+                language: language
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Diagnosis response:', data);
+            hideLoadingModal(); // Hide the loading modal
+            window.location.href = "/en/report";
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            hideLoadingModal(); // Hide the loading modal
+            alert('An error occurred. Please try again.');
+        });
+    }
+</script>
 </body>
 </html>
