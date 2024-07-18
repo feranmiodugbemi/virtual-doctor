@@ -1,6 +1,4 @@
 from flask import Flask, render_template, request, jsonify, session, redirect
-from flask.sessions import SessionInterface
-from flask_session import Session as FlaskSession
 from flask_session import Session
 from datetime import timedelta
 from flask_cors import CORS
@@ -8,39 +6,32 @@ import os
 from dotenv import load_dotenv
 import json
 import requests
-import uuid
-
-class CustomSessionInterface(SessionInterface):
-    def open_session(self, app, request):
-        return FlaskSession().open_session(app, request)
-
-    def save_session(self, app, session, response):
-        return FlaskSession().save_session(app, session, response)
-
-    def get_cookie_samesite(self, app):
-        return app.config.get('SESSION_COOKIE_SAMESITE', None)
-
+from redis import Redis
 
 load_dotenv()
 
 app = Flask(__name__)
+
+# Redis Configuration
+app.config["SESSION_TYPE"] = "redis"
 app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-app.config['SESSION_COOKIE_SECURE'] = True
-app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['SESSION_COOKIE_SAMESITE'] = 'None'
-app.secret_key = 'abcd1234'
+app.config["SESSION_USE_SIGNER"] = True
+app.config["SESSION_REDIS"] = Redis.from_url(os.getenv("KV_URL"))
+
+app.secret_key = os.getenv("SECRET_KEY", "fallback_secret_key")  # Use an environment variable for the secret key
 app.permanent_session_lifetime = timedelta(minutes=30)
-app.session_interface = CustomSessionInterface()
+
+# Initialize the session extension
 Session(app)
-CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": ["http://localhost:5000", "http://127.0.0.1:5000"]}})
+
+# CORS setup
+CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": [
+    "http://localhost:5000", 
+    "http://127.0.0.1:5000",
+    "https://virtual-doctor-jade.vercel.com"  # Add your Vercel domain here
+]}})
 
 endpoint = os.getenv("API_ENDPOINT")
-
-@app.before_request
-def before_request():
-    if 'user_id' not in session:
-        session['user_id'] = str(uuid.uuid4())
 
 @app.route("/")
 def home():
@@ -49,33 +40,30 @@ def home():
 # APP Routes for the English version
 @app.route("/en/onboarding")
 def en_onboarding():
-    user_id = session.get('user_id')
-    if not user_id or session.get(f"{user_id}_language") != 'english':
+    if not session.get("name") or session.get("language") != 'english':
         return redirect("/")
-    return render_template("en/2-onboarding.html", name=session.get(f"{user_id}_name"))
+    return render_template("en/2-onboarding.html", name=session.get("name"))
 
 @app.route("/en/select-assistant")
 def en_select_assistant():
-    user_id = session.get('user_id')
-    if not user_id or session.get(f"{user_id}_language") != 'english':
+    if not session.get("name") or session.get("language") != 'english':
         return redirect("/")
-    return render_template("en/3-select-assistant.html", name=session.get(f"{user_id}_name"))
+    return render_template("en/3-select-assistant.html", name=session.get("name"))
 
 @app.route("/en/select-input")
 def en_select_input():
-    user_id = session.get('user_id')
-    if not user_id or session.get(f"{user_id}_language") != 'english':
+    if not session.get("name") or session.get("language") != 'english':
         return redirect("/")
     
     avatar_url = None
     avatar_voice = None
     avatar_body = None
-    if f"{user_id}_assistant" in session:
-        if session[f"{user_id}_assistant"] == 'female':
+    if "assistant" in session:
+        if session["assistant"] == 'female':
             avatar_url = "https://models.readyplayer.me/6685cdb9539979578e51c626.glb?morphTargets=ARKit,Oculus+Visemes,mouthOpen,mouthSmile,eyesClosed,eyesLookUp,eyesLookDown&textureSizeLimit=1024&textureFormat=png"
             avatar_voice = "en-GB-Standard-A"
             avatar_body = 'F'
-        elif session[f"{user_id}_assistant"] == 'male':
+        elif session["assistant"] == 'male':
             avatar_url = "https://models.readyplayer.me/66841b4f3a3799e2f94177e8.glb?morphTargets=ARKit,Oculus+Visemes,mouthOpen,mouthSmile,eyesClosed,eyesLookUp,eyesLookDown&textureSizeLimit=1024&textureFormat=png"
             avatar_voice ="en-GB-Standard-B"
             avatar_body = 'M'
@@ -85,71 +73,63 @@ def en_select_input():
 
 @app.route("/en/text-input")
 def en_text_input():
-    user_id = session.get('user_id')
-    if not user_id or session.get(f"{user_id}_language") != 'english':
+    if not session.get("name") or session.get("language") != 'english':
         return redirect("/")
     return render_template("en/5-text-input.html")
 
 @app.route("/en/image-input")
 def en_image_input():
-    user_id = session.get('user_id')
-    if not user_id or session.get(f"{user_id}_language") != 'english':
+    if not session.get("name") or session.get("language") != 'english':
         return redirect("/")
     return render_template("en/6-image-input.html")
 
 @app.route("/en/face-scan")
 def en_face_scan():
-    user_id = session.get('user_id')
-    if not user_id or session.get(f"{user_id}_language") != 'english':
+    if not session.get("name") or session.get("language") != 'english':
         return redirect("/")
     return render_template("en/7-face-scan-input.html")
 
 @app.route("/en/report")
 def en_report():
-    user_id = session.get('user_id')
-    if not user_id or session.get(f"{user_id}_language") != 'english':
+    if not session.get("name") or session.get("language") != 'english':
         return redirect("/")
     return render_template("en/8-report.html", 
-                           disease1=session.get(f"{user_id}_disease1"),
-                           disease2=session.get(f"{user_id}_disease2"),
-                           disease3=session.get(f"{user_id}_disease3"))
+                           disease1=session.get("disease1"),
+                           disease2=session.get("disease2"),
+                           disease3=session.get("disease3"))
 
 @app.route("/en/chat")
 def en_chat():
-    user_id = session.get('user_id')
-    if not user_id or session.get(f"{user_id}_language") != 'english':
+    if not session.get("name") or session.get("language") != 'english':
         return redirect("/")
     return render_template("en/9-chat.html")
 
 # APP Routes for the IGBO version
 @app.route("/ig/onboarding")
 def ig_onboarding():
-    user_id = session.get('user_id')
-    if not user_id or session.get(f"{user_id}_language") != 'igbo':
+    if not session.get("name") or session.get("language") != 'igbo':
         return redirect("/")
-    return render_template("ig/2-onboarding.html", name=session.get(f"{user_id}_name"))
+    return render_template("ig/2-onboarding.html", name=session.get("name"))
 
 @app.route("/ig/select-assistant")
 def ig_select_assistant():
-    user_id = session.get('user_id')
-    if not user_id or session.get(f"{user_id}_language") != 'igbo':
+    if not session.get("name") or session.get("language") != 'igbo':
         return redirect("/")
-    return render_template("ig/3-select-assistant.html", name=session.get(f"{user_id}_name"))
+    return render_template("ig/3-select-assistant.html", name=session.get("name"))
 
 @app.route("/ig/select-input")
 def ig_select_input():
-    user_id = session.get('user_id')
-    if not user_id or session.get(f"{user_id}_language") != 'igbo':
+    if not session.get("name") or session.get("language") != 'igbo':
         return redirect("/")
     avatar_url = None
     avatar_voice = None
     avatar_body = None
-    if f"{user_id}_assistant" in session:
-        if session[f"{user_id}_assistant"] == 'female':
+    if "assistant" in session:
+        if session["assistant"] == 'female':
             avatar_url = "https://models.readyplayer.me/6685cdb9539979578e51c626.glb?morphTargets=ARKit,Oculus+Visemes,mouthOpen,mouthSmile,eyesClosed,eyesLookUp,eyesLookDown&textureSizeLimit=1024&textureFormat=png"
             avatar_voice = "en-GB-Standard-A"
             avatar_body = 'F'
-        elif session[f"{user_id}_assistant"] == 'male':
+        elif session["assistant"] == 'male':
             avatar_url = "https://models.readyplayer.me/66841b4f3a3799e2f94177e8.glb?morphTargets=ARKit,Oculus+Visemes,mouthOpen,mouthSmile,eyesClosed,eyesLookUp,eyesLookDown&textureSizeLimit=1024&textureFormat=png"
             avatar_voice ="en-GB-Standard-B"
             avatar_body = 'M'
@@ -159,66 +139,56 @@ def ig_select_input():
 
 @app.route("/ig/text-input")
 def ig_text_input():
-    user_id = session.get('user_id')
-    if not user_id or session.get(f"{user_id}_language") != 'igbo':
+    if not session.get("name") or session.get("language") != 'igbo':
         return redirect("/")
     return render_template("ig/5-text-input.html")
 
 @app.route("/ig/image-input")
 def ig_image_input():
-    user_id = session.get('user_id')
-    if not user_id or session.get(f"{user_id}_language") != 'igbo':
+    if not session.get("name") or session.get("language") != 'igbo':
         return redirect("/")
     return render_template("ig/6-image-input.html")
 
 @app.route("/ig/face-scan")
 def ig_face_scan():
-    user_id = session.get('user_id')
-    if not user_id or session.get(f"{user_id}_language") != 'igbo':
+    if not session.get("name") or session.get("language") != 'igbo':
         return redirect("/")
     return render_template("ig/7-face-scan-input.html")
 
 @app.route("/ig/report")
 def ig_report():
-    user_id = session.get('user_id')
-    if not user_id or session.get(f"{user_id}_language") != 'igbo':
+    if not session.get("name") or session.get("language") != 'igbo':
         return redirect("/")
     return render_template("ig/8-report.html", 
-                           disease1=session.get(f"{user_id}_disease1"),
-                           disease2=session.get(f"{user_id}_disease2"),
-                           disease3=session.get(f"{user_id}_disease3"))
+                           disease1=session.get("disease1"),
+                           disease2=session.get("disease2"),
+                           disease3=session.get("disease3"))
 
 @app.route("/ig/chat")
 def ig_chat():
-    user_id = session.get('user_id')
-    if not user_id or session.get(f"{user_id}_language") != 'igbo':
+    if not session.get("name") or session.get("language") != 'igbo':
         return redirect("/")
     return render_template("ig/9-chat.html")
 
 @app.route('/api/language', methods=["POST"])
 def language_select():
-    user_id = session.get('user_id')
     data = request.json
-    name = data.get('name')
-    language = data.get('language')
-    session[f"{user_id}_name"] = name
-    session[f"{user_id}_language"] = language
+    session["name"] = data.get('name')
+    session["language"] = data.get('language')
     return jsonify({}), 200
 
 @app.route('/api/assistant', methods=["POST"])
 def assistant_select():
-    user_id = session.get('user_id')
     data = request.json
     assistant = data.get('assistant')
     if assistant not in ['male', 'female']:
         return jsonify({}), 400
     else:
-        session[f"{user_id}_assistant"] = assistant
+        session["assistant"] = assistant
         return jsonify({}), 200
 
 @app.route('/api/diagnosis', methods=["POST"])
 def diagnosis():
-    user_id = session.get('user_id')
     diagnosis_endpoint = f"{endpoint}/medicalai/api/v1/diagnosis-api"
     data = request.json
     language = data.get('language')
@@ -238,13 +208,13 @@ def diagnosis():
     if len(lines) >= 3:
         # Extract treatment
         treatment = lines[1].replace('Treatment is: ', '').strip()
-        session[f"{user_id}_treatment"] = treatment
+        session['treatment'] = treatment
 
         # Extract diseases
         diseases = lines[2].split('-')
-        session[f"{user_id}_disease1"] = diseases[0] if len(diseases) > 0 else ''
-        session[f"{user_id}_disease2"] = diseases[1] if len(diseases) > 1 else ''
-        session[f"{user_id}_disease3"] = diseases[2] if len(diseases) > 2 else ''
+        session['disease1'] = diseases[0] if len(diseases) > 0 else ''
+        session['disease2'] = diseases[1] if len(diseases) > 1 else ''
+        session['disease3'] = diseases[2] if len(diseases) > 2 else ''
 
     return jsonify({}), 200
 
