@@ -13,10 +13,14 @@ load_dotenv()
 app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
 app.secret_key = 'abcd1234'
 app.permanent_session_lifetime = timedelta(minutes=30)
+app.session_interface = CustomSessionInterface()
 Session(app)
-CORS(app, resources={r"/api/*": {"origins": ["http://localhost:5000", "http://127.0.0.1:5000"]}})
+CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": ["http://localhost:5000", "http://127.0.0.1:5000"]}})
 
 endpoint = os.getenv("API_ENDPOINT")
 
