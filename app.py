@@ -13,10 +13,21 @@ load_dotenv()
 app = Flask(__name__)
 
 # Redis Configuration
+
+host = os.getenv("REDIS_UPSTASH_HOST")
+password = os.getenv("REDIS_UPSTASH_PASSWORD")
+
+redis_instance = Redis(
+    host=host,
+    port=6379,
+    password=password,
+    ssl=True
+)
+
 app.config["SESSION_TYPE"] = "redis"
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_USE_SIGNER"] = True
-app.config["SESSION_REDIS"] = Redis.from_url(os.getenv("KV_URL"))
+app.config["SESSION_REDIS"] = redis_instance
 
 app.secret_key = os.getenv("SECRET_KEY", "fallback_secret_key")  # Use an environment variable for the secret key
 app.permanent_session_lifetime = timedelta(minutes=30)
