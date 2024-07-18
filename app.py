@@ -1,4 +1,6 @@
 from flask import Flask, render_template, request, jsonify, session, redirect
+from flask.sessions import SessionInterface
+from flask_session import Session as FlaskSession
 from flask_session import Session
 from datetime import timedelta
 from flask_cors import CORS
@@ -7,6 +9,17 @@ from dotenv import load_dotenv
 import json
 import requests
 import uuid
+
+class CustomSessionInterface(SessionInterface):
+    def open_session(self, app, request):
+        return FlaskSession().open_session(app, request)
+
+    def save_session(self, app, session, response):
+        return FlaskSession().save_session(app, session, response)
+
+    def get_cookie_samesite(self, app):
+        return app.config.get('SESSION_COOKIE_SAMESITE', None)
+
 
 load_dotenv()
 
