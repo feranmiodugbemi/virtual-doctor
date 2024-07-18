@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ig">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Symptom Checker</title>
+    <title>Nnyocha Ọrịa</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -76,36 +76,129 @@
             margin-top: 10px;
             font-size: 12px;
         }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+            border-radius: 5px;
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Nyocha mgbaàmà</h2>
+    <h2>Nnyocha Ọrịa</h2>
     <div class="symptoms-grid">
-        <label class="symptom"><input type="checkbox"> Ọrịa ọrịa</label>
-        <label class="symptom"><input type="checkbox"> Umeri</label>
-        <label class="symptom"><input type="checkbox"> Ọgụ</label>
-        <label class="symptom"><input type="checkbox"> Obi ịnya ọsọ</label>
-        <label class="symptom"><input type="checkbox"> Isi ọwụ</label>
-        <label class="symptom"><input type="checkbox"> Ike mgbaji na ike agwụ</label>
-        <label class="symptom"><input type="checkbox"> Ọgbụgbọ na ịpụ afọ</label>
-        <label class="symptom"><input type="checkbox"> Akpụkpụ ahụ</label>
-        <label class="symptom"><input type="checkbox"> Isi ike na mkpịsị aka</label>
-        <label class="symptom"><input type="checkbox"> Ọrịa afọ</label>
-        <label class="symptom"><input type="checkbox"> Ọrịa afọ</label>
-        <label class="symptom"><input type="checkbox"> Agha</label>
-        <label class="symptom"><input type="checkbox"> Ọkpụkpụ na mgbu akwara</label>
+        <label class="symptom"><input type="checkbox"> Ahụ Ọkụ</label>
+        <label class="symptom"><input type="checkbox"> Ụkwara</label>
+        <label class="symptom"><input type="checkbox"> Oyi na-atụ</label>
+        <label class="symptom"><input type="checkbox"> Ọkụ Obi Ọsọ Ọsọ</label>
+        <label class="symptom"><input type="checkbox"> Isi Mgbu</label>
+        <label class="symptom"><input type="checkbox"> Adịghị Ike na Ike Ọgwụgwụ</label>
+        <label class="symptom"><input type="checkbox"> Ọgwụ na Ọgbụgba</label>
+        <label class="symptom"><input type="checkbox"> Ahụ Mgbu</label>
+        <label class="symptom"><input type="checkbox"> Ọsọ Ọsọ Ịnyụ Ahụ na Ịkpọ Afọ</label>
+        <label class="symptom"><input type="checkbox"> Afọ Ọgbu</label>
+        <label class="symptom"><input type="checkbox"> Akụkụ Afọ Ọgbu</label>
+        <label class="symptom"><input type="checkbox"> Akpụkpọ Ahụ Ọhịa</label>
+        <label class="symptom"><input type="checkbox"> Ụkwụ na Ahụ Mgbu</label>
     </div>
     <div class="others">
-        <input type="text" placeholder="Ndụ ọzọ, kewara site na mkpụrụ(e.g Ọkọchị, ọrịa)">
+        <input type="text" placeholder="Ndị ọzọ, jiri kọma kewaa (dịka Oyi, ahụ ọkụ)">
     </div>
-
     <div class="confirmation">
-        <a href="#" class="proceed-btn">Gaa n'ihu</a>
+        <a href="#" class="proceed-btn" onclick="logSymptoms()">Gaa n'Ihu</a>
     </div>
-    <p class="local-language">Select the symptoms you're exhibiting</p>
+    <p class="local-language">Choose the above writings that relate to your illness</p>
 </div>
 
+<!-- Modal -->
+<div id="loadingModal" class="modal">
+    <div class="modal-content">
+        <div class="loader"></div>
+        <p>Na-enyocha ọrịa gị...</p>
+    </div>
+</div>
+
+<script>
+    function logSymptoms() {
+        const checkboxes = document.querySelectorAll('.symptom input[type="checkbox"]:checked');
+        const otherSymptoms = document.querySelector('.others input').value.trim();
+        
+        let symptoms = Array.from(checkboxes).map(checkbox => checkbox.parentNode.textContent.trim());
+        
+        if (otherSymptoms) {
+            symptoms = symptoms.concat(otherSymptoms.split(',').map(symptom => symptom.trim()));
+        }
+        
+        const result = symptoms.join(', ');
+        console.log(result);
+        makeDiagnosisRequest(result);
+    }
+
+    function showLoadingModal() {
+        document.getElementById('loadingModal').style.display = 'block';
+    }
+
+    function hideLoadingModal() {
+        document.getElementById('loadingModal').style.display = 'none';
+    }
+
+    function makeDiagnosisRequest(symptoms) {
+        const language = 'ig'; // Changed to Igbo
+
+        showLoadingModal(); // Show the loading modal
+
+        fetch('/api/diagnosis', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                symptoms: symptoms,
+                language: language
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Diagnosis response:', data);
+            hideLoadingModal(); // Hide the loading modal
+            window.location.href = "/ig/report"; // Changed to Igbo route
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            hideLoadingModal(); // Hide the loading modal
+            alert('Nsogbu dapụtara. Biko nwaa ọzọ.'); // Error message in Igbo
+        });
+    }
+</script>
 </body>
 </html>

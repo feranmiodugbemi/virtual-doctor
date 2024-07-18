@@ -27,7 +27,6 @@ def home():
 # APP Routes for the English version
 @app.route("/en/onboarding")
 def en_onboarding():
-    print(f"Name - {session.get('name')}")
     if not session.get("name") or session.get("language") != 'english':
         return redirect("/")
     return render_template("en/2-onboarding.html", name=session.get("name"))
@@ -98,19 +97,34 @@ def en_chat():
 def ig_onboarding():
     if not session.get("name") or session.get("language") != 'igbo':
         return redirect("/")
-    return render_template("ig/2-onboarding.html")
+    return render_template("ig/2-onboarding.html", name=session.get("name"))
 
 @app.route("/ig/select-assistant")
 def ig_select_assistant():
     if not session.get("name") or session.get("language") != 'igbo':
         return redirect("/")
-    return render_template("ig/3-select-assistant.html")
+    return render_template("ig/3-select-assistant.html", name=session.get("name"))
 
 @app.route("/ig/select-input")
 def ig_select_input():
     if not session.get("name") or session.get("language") != 'igbo':
         return redirect("/")
-    return render_template("ig/4-select-input.html")
+    avatar_url = None
+    avatar_voice = None
+    avatar_body = None
+    if "assistant" in session:
+        if session["assistant"] == 'female':
+            avatar_url = "https://models.readyplayer.me/6685cdb9539979578e51c626.glb?morphTargets=ARKit,Oculus+Visemes,mouthOpen,mouthSmile,eyesClosed,eyesLookUp,eyesLookDown&textureSizeLimit=1024&textureFormat=png"
+            avatar_voice = "en-GB-Standard-A"
+            avatar_body = 'F'
+        elif session["assistant"] == 'male':
+            avatar_url = "https://models.readyplayer.me/66841b4f3a3799e2f94177e8.glb?morphTargets=ARKit,Oculus+Visemes,mouthOpen,mouthSmile,eyesClosed,eyesLookUp,eyesLookDown&textureSizeLimit=1024&textureFormat=png"
+            avatar_voice ="en-GB-Standard-B"
+            avatar_body = 'M'
+        else:
+            return redirect('/ig/select-assistant')
+    return render_template("ig/4-select-input.html", avatar_url=avatar_url, avatar_voice=avatar_voice, avatar_body=avatar_body)
+
 
 @app.route("/ig/text-input")
 def ig_text_input():
@@ -134,7 +148,7 @@ def ig_face_scan():
 def ig_report():
     if not session.get("name") or session.get("language") != 'igbo':
         return redirect("/")
-    return render_template("ig/8-report.html")
+    return render_template("ig/8-report.html", disease1=session.get("disease1"), disease2=session.get("disease2"), disease3=session.get("disease3"))
 
 @app.route("/ig/chat")
 def ig_chat():

@@ -1,156 +1,234 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rapid Kure Prompts</title>
-<style>
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f8ff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    padding: 20px;
-    box-sizing: border-box;
-}
-.container {
-    background-color: white;
-    border-radius: 15px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.1);
-    padding: 30px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 30px;
-    max-width: 600px;
-    width: 100%;
-}
-.avatar-container {
-    width: 200px;
-    height: 200px;
-}
-.content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-}
-.speech-bubble {
-    background-color: #e6f3ff;
-    border-radius: 20px;
-    padding: 15px;
-    margin-bottom: 20px;
-    position: relative;
-    max-width: 100%;
-    text-align: center;
-}
-.button {
-    background-color: #f0f0f0;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    margin: 5px 0;
-    width: 100%;
-    text-align: left;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-.button:hover {
-    background-color: #e0e0e0;
-}
-#loading {
-    text-align: center;
-    margin-top: 10px;
-}
-
-@media (min-width: 768px) {
-    .container {
-        flex-direction: row;
-        align-items: flex-start;
-    }
-    .content {
-        align-items: flex-start;
-    }
-    .speech-bubble {
+<html lang="ig">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ngwa Ngwa Kure Prompts</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f8ff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+      .container {
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+        max-width: 600px;
+        width: 100%;
+      }
+      .avatar-container {
+        width: 200px;
+        height: 200px;
+      }
+      .content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+      .speech-bubble {
+        background-color: #e6f3ff;
+        border-radius: 20px;
+        padding: 15px;
+        margin-bottom: 20px;
+        position: relative;
+        max-width: 100%;
+        text-align: center;
+      }
+      .button {
+        background-color: #f0f0f0;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        margin: 5px 0;
+        width: 100%;
         text-align: left;
-    }
-    .speech-bubble::after {
-        content: '';
-        position: absolute;
-        left: -15px;
-        top: 50%;
-        border-width: 15px 15px 15px 0;
-        border-style: solid;
-        border-color: transparent #e6f3ff transparent transparent;
-    }
-}
-</style>
-<script type="importmap">
-  { "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js/+esm",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/",
-    "talkinghead": "https://cdn.jsdelivr.net/gh/met4citizen/TalkingHead@1.2/modules/talkinghead.mjs"
-  } }
-</script>
-</head>
-<body>
-<div class="container">
-    <div id="avatar" class="avatar-container"></div>
-    <div class="content">
-        <div class="speech-bubble">
-          họrọ usoro ntinye nke ị chọrọ iji jụọ LLM
-        </div>
-        <button class="button">Ntinye Okwu</button>
-        <button class="button">Ntinye Ụdị oyiyi</button>
-        <button class="button">Ntinye Nchọpụta ozugbo</button>
-    </div>
-</div>
-<div id="loading"></div>
-<script type="module">
-    import { TalkingHead } from "talkinghead";
-    let head;
-    document.addEventListener('DOMContentLoaded', async function(e) {
-      const nodeAvatar = document.getElementById('avatar');
-      head = new TalkingHead( nodeAvatar, {
-        ttsEndpoint: "https://eu-texttospeech.googleapis.com/v1beta1/text:synthesize",
-        ttsApikey: "put-your-own-Google-TTS-API-key-here", // <- Change this
-        lipsyncModules: ["en", "fi"],
-        cameraView: "upper"
-      });
-      const nodeLoading = document.getElementById('loading');
-      try {
-        nodeLoading.textContent = "Loading...";
-        await head.showAvatar( {
-          url: 'https://models.readyplayer.me/6685cdb9539979578e51c626.glb',
-          body: 'F',
-          avatarMood: 'neutral',
-          ttsLang: "en-GB",
-          ttsVoice: "en-GB-Standard-A",
-          lipsyncLang: 'en'
-        }, (ev) => {
-          if ( ev.lengthComputable ) {
-            let val = Math.min(100,Math.round(ev.loaded/ev.total * 100 ));
-            nodeLoading.textContent = "Loading " + val + "%";
-          }
-        });
-        nodeLoading.style.display = 'none';
-        const content = document.querySelector('.speech-bubble').textContent.trim();
-        head.speakText(content);
-      } catch (error) {
-        console.log(error);
-        nodeLoading.textContent = error.toString();
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      .button:hover {
+        background-color: #e0e0e0;
+      }
+      .button.selected {
+        background-color: #d0d0d0;
+      }
+      #loading {
+        text-align: center;
+        margin-top: 10px;
+      }
+      #continue-button {
+        display: none;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        margin-top: 20px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      #continue-button:hover {
+        background-color: #45a049;
+      }
+      .arrow-icon {
+        margin-left: 10px;
       }
 
-      // Add click events to make avatar speak button text
-      document.querySelectorAll('.button').forEach((button) => {
-        button.addEventListener('click', () => {
-          head.speakText(button.textContent);
+      @media (min-width: 768px) {
+        .container {
+          flex-direction: row;
+          align-items: flex-start;
+        }
+        .content {
+          align-items: flex-start;
+        }
+        .speech-bubble {
+          text-align: left;
+        }
+        .speech-bubble::after {
+          content: "";
+          position: absolute;
+          left: -15px;
+          top: 50%;
+          border-width: 15px 15px 15px 0;
+          border-style: solid;
+          border-color: transparent #e6f3ff transparent transparent;
+        }
+      }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js/+esm",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/",
+          "talkinghead": "https://cdn.jsdelivr.net/gh/met4citizen/TalkingHead@1.2/modules/talkinghead.mjs"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <div id="avatar" class="avatar-container"></div>
+      <div class="content">
+        <p id="modelType" style="display: none">{{avatar_url}}</p>
+        <p id="modelVoice" style="display: none">{{avatar_voice}}</p>
+        <p id="modelBody" style="display: none">{{avatar_body}}</p>
+        <div class="speech-bubble">
+          Họrọ usoro ịnye ozi ị chọrọ iji jụọ LLM
+        </div>
+        <button class="button" data-redirect="/ig/text-input">Ịnye Ederede</button>
+        <button class="button" data-redirect="/ig/image-input">Ịnye Foto</button>
+        <button class="button" data-redirect="/ig/face-scan">Ịnye Site na Nyocha Ozugbo</button>
+        <button id="continue-button">
+          Gaa n'ihu
+          <span class="arrow-icon">➔</span>
+        </button>
+      </div>
+      <svg
+        id="speaker-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        style="cursor: pointer"
+      >
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <path
+          d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"
+        ></path>
+      </svg>
+    </div>
+    <div id="loading"></div>
+    <script type="module">
+      import { TalkingHead } from "talkinghead";
+      let head;
+      document.addEventListener("DOMContentLoaded", async function (e) {
+        const nodeAvatar = document.getElementById("avatar");
+        head = new TalkingHead(nodeAvatar, {
+          ttsEndpoint:
+            "https://eu-texttospeech.googleapis.com/v1beta1/text:synthesize",
+          ttsApikey: "AIzaSyAWtezgKPFuyP45SX0ZyO7ZGRHjLePr2hE", // <- Change this
+          lipsyncModules: ["en", "fi"],
+          cameraView: "upper",
+        });
+        const nodeLoading = document.getElementById("loading");
+        const model = document.getElementById("modelType").textContent;
+        const modelVoice = document.getElementById("modelVoice").textContent;
+        const modelBody = document.getElementById("modelBody").textContent;
+        try {
+          nodeLoading.textContent = "Na-ebunye...";
+          await head.showAvatar(
+            {
+              url: model,
+              body: modelBody,
+              avatarMood: "neutral",
+              ttsLang: "en-GB",
+              ttsVoice: modelVoice,
+              lipsyncLang: "en",
+            },
+            (ev) => {
+              if (ev.lengthComputable) {
+                let val = Math.min(
+                  100,
+                  Math.round((ev.loaded / ev.total) * 100)
+                );
+                nodeLoading.textContent = "Na-ebunye " + val + "%";
+              }
+            }
+          );
+          nodeLoading.style.display = "none";
+          const content = document
+            .querySelector(".speech-bubble")
+            .textContent.trim();
+          head.speakText(content);
+        } catch (error) {
+          console.log(error);
+          nodeLoading.textContent = error.toString();
+        }
+
+        const speakerIcon = document.getElementById("speaker-icon");
+
+        speakerIcon.addEventListener("click", function () {
+          head.speakText("Họrọ usoro ịnye ozi ị chọrọ iji jụọ LLM");
+        });
+
+        // New code for button selection and continue button
+        const buttons = document.querySelectorAll('.button');
+        const continueButton = document.getElementById('continue-button');
+        let selectedRedirect = '';
+
+        buttons.forEach(button => {
+          button.addEventListener('click', function() {
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            this.classList.add('selected');
+            selectedRedirect = this.getAttribute('data-redirect');
+            continueButton.style.display = 'inline-block';
+          });
+        });
+
+        continueButton.addEventListener('click', function() {
+          if (selectedRedirect) {
+            window.location.href = selectedRedirect;
+          }
         });
       });
-    });
-</script>
-</body>
+    </script>
+  </body>
 </html>

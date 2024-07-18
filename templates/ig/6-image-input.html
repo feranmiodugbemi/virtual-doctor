@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ig">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Symptom Checker</title>
+<title>Nnyocha Ọrịa</title>
 <style>
 body {
     font-family: Arial, sans-serif;
@@ -82,33 +82,125 @@ h2 {
     margin-top: 10px;
     font-size: 12px;
 }
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+    border-radius: 5px;
+}
+.loader {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 </style>
 </head>
 <body>
 <div class="container">
-<h2>Nyocha mgbaàmà</h2>
+<h2>Nnyocha Ọrịa</h2>
 <div class="symptoms-grid">
-    <div class="symptom"><img src="../static/Symptoms images/Loss of appetite.jpg" alt="Loss of appetite"><input type="checkbox"></div>
-    <div class="symptom"><img src="../static/Symptoms images/Joint pain.jpg" alt="Joint pain"><input type="checkbox"></div>
-    <div class="symptom"><img src="../static/Symptoms images/Chest pain.jpg" alt="Chest pain"><input type="checkbox"></div>
-    <div class="symptom"><img src="../static/Symptoms images/Nausea and vomiting.jpg" alt="Nausea and vomiting"><input type="checkbox"></div>
-    <div class="symptom"><img src="../static/Symptoms images/Weakness.jpg" alt="Weakness"><input type="checkbox"></div>
-    <div class="symptom"><img src="../static/Symptoms images/Cold.jpg" alt="Cold"><input type="checkbox"></div>
-    <div class="symptom"><img src="../static/Symptoms images/Fever.jpg" alt="Fever"><input type="checkbox"></div>
-    <div class="symptom"><img src="../static/Symptoms images/Dizziness.jpg" alt="Dizziness"><input type="checkbox"></div>
-    <div class="symptom"><img src="../static/Symptoms images/Headache.jpg" alt="Headache"><input type="checkbox"></div>
-    <div class="symptom"><img src="../static/Symptoms images/Rashes.jpg" alt="Rashes"><input type="checkbox"></div>
-    <div class="symptom"><img src="../static/Symptoms images/Sore throat.jpg" alt="Sore throat"><input type="checkbox"></div>
-    <div class="symptom"><img src="../static/Symptoms images/Diarrhea.jpg" alt="Diarrhea"><input type="checkbox"></div>
-    <div class="symptom"><img src="../static/Symptoms images/Stomach pain.jpg" alt="Stomach pain"><input type="checkbox"></div>
-    <div class="symptom"><img src="../static/Symptoms images/Shortness of breath.jpg" alt="Shortness of breath"><input type="checkbox"></div>
-    <div class="symptom"><img src="../static/Symptoms images/Cough.jpg" alt="Cough"><input type="checkbox"></div>
-    <div class="symptom"><img src="../static/Symptoms images/Blurry vision.jpg" alt="Blurry vision"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Loss of appetite.jpg" alt="Ịda ụbụrụ"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Joint pain.jpg" alt="Mgbu ọkpụkpụ"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Chest pain.jpg" alt="Mgbu obi"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Nausea and vomiting.jpg" alt="Ọgwụ na ọgbụgba"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Weakness.jpg" alt="Adịghị ike"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Cold.jpg" alt="Oyi"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Fever.jpg" alt="Ahụ ọkụ"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Dizziness.jpg" alt="Isi mgbaka"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Headache.jpg" alt="Isi mgbu"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Rashes.jpg" alt="Akpụkpọ ahụ ọhịa"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Sore throat.jpg" alt="Akpịrị mgbu"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Diarrhea.jpg" alt="Ọsọ ọsọ ịnyụ ahụ"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Stomach pain.jpg" alt="Afọ ọgbu"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Shortness of breath.jpg" alt="Iku ume mgbagwoju anya"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Cough.jpg" alt="Ụkwara"><input type="checkbox"></div>
+    <div class="symptom"><img src="../static/Symptoms images/Blurry vision.jpg" alt="Ịhụ ihe na-agbachi agbachi"><input type="checkbox"></div>
 </div>
 <div class="confirmation">
-<a href="#" class="proceed-btn">Gaa n'ihu</a>
+<a href="#" class="proceed-btn" onclick="logSymptoms()">Gaa n'Ihu</a>
 </div>
-<p class="local-language">Select the symptoms you're exhibiting</p>
+<p class="local-language">Choose the above photos that relate to your illness</p>
 </div>
+
+<!-- Modal -->
+<div id="loadingModal" class="modal">
+    <div class="modal-content">
+        <div class="loader"></div>
+        <p>Na-enyocha ọrịa gị...</p>
+    </div>
+</div>
+
+<script>
+    function logSymptoms() {
+        const checkedSymptoms = document.querySelectorAll('.symptom input[type="checkbox"]:checked');
+        
+        let symptoms = Array.from(checkedSymptoms).map(checkbox => {
+            return checkbox.parentNode.querySelector('img').alt;
+        });
+        
+        const result = symptoms.join(', ');
+        console.log(result);
+        makeDiagnosisRequest(result);
+    }
+
+    function showLoadingModal() {
+        document.getElementById('loadingModal').style.display = 'block';
+    }
+
+    function hideLoadingModal() {
+        document.getElementById('loadingModal').style.display = 'none';
+    }
+
+    function makeDiagnosisRequest(symptoms) {
+        const language = 'ig'; // Changed to Igbo
+
+        showLoadingModal(); // Show the loading modal
+
+        fetch('/api/diagnosis', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                symptoms: symptoms,
+                language: language
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Diagnosis response:', data);
+            hideLoadingModal(); // Hide the loading modal
+            window.location.href = "/ig/report"; // Changed to Igbo route
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            hideLoadingModal(); // Hide the loading modal
+            alert('Nsogbu dapụtara. Biko nwaa ọzọ.'); // Error message in Igbo
+        });
+    }
+</script>
 </body>
 </html>
