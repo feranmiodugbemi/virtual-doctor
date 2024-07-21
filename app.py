@@ -94,7 +94,7 @@ def create_symptom_chart(symptoms, percentages):
     
     return drawing
 
-def generate_conversation_report(buffer, patient_info, conversation):
+def generate_conversation_report(buffer, patient_info, conversation, symptoms):
     doc = SimpleDocTemplate(buffer, pagesize=letter)
     
     styles = getSampleStyleSheet()
@@ -159,7 +159,6 @@ def generate_conversation_report(buffer, patient_info, conversation):
     
     # Symptom Chart
     story.append(Paragraph("Symptom Severity Chart", styles['Heading2']))
-    symptoms = ['Malaria', 'Fever', 'Typhoid fever']
     percentages = [50, 30, 20]  # Example percentages, adjust as needed
     chart = create_symptom_chart(symptoms, percentages)
     story.append(chart)
@@ -494,7 +493,7 @@ def generate_report():
     pdf_buffer = io.BytesIO()
 
     # Generate the report
-    generate_conversation_report(pdf_buffer, patient_info, conversation)
+    generate_conversation_report(pdf_buffer, patient_info, conversation, [session["disease1"], session["disease2"], session["disease3"]])
 
     # Move the buffer's cursor to the beginning
     pdf_buffer.seek(0)
