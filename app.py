@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, send_file
+from flask import Flask, render_template, request, jsonify, session, redirect, send_file, make_response
 from flask_session import Session
 from datetime import timedelta
 from flask_cors import CORS
@@ -7,16 +7,18 @@ from dotenv import load_dotenv
 import json
 import requests
 from redis import Redis
+import io
+import datetime
+from flask import session, send_file
+from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
-from reportlab.lib import colors
 from reportlab.lib.units import inch
-from reportlab.graphics.shapes import Drawing
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.graphics.shapes import Drawing, String
 from reportlab.graphics.charts.barcharts import VerticalBarChart
-import datetime
-import io
-
+from reportlab.graphics.shapes import String as Label
+from reportlab.lib import colors
 load_dotenv()
 
 app = Flask(__name__)
@@ -81,18 +83,19 @@ def create_symptom_chart(symptoms, percentages):
     bc.categoryAxis.labels.angle = 30
     bc.categoryAxis.categoryNames = symptoms
     
+    drawing.add(bc)
+    
     # Add percentage labels to the bars
     for i, value in enumerate(data[0]):
-        label = Label()
-        label.setOrigin(bc.x + i * (bc.width / len(data[0])) + 15, bc.y + value + 5)
-        label.setText(f'{value}%\n({percentages[i]}%)')
+        label = String(bc.x + i * (bc.width / len(data[0])) + 15, 
+                       bc.y + value + 5, 
+                       f'{value}%\n({percentages[i]}%)')
         label.fontSize = 8
         label.textAnchor = 'middle'
         drawing.add(label)
     
-    drawing.add(bc)
-    
     return drawing
+
 
 def generate_conversation_report(buffer, patient_info, conversation, symptoms):
     doc = SimpleDocTemplate(buffer, pagesize=letter)
@@ -477,35 +480,45 @@ def diagnosis():
 
     return jsonify({}), 200
 
-@app.route('/generate_report', methods=['POST'])
+
+@app.route('/generate_report', methods=['POST', 'GET'])
 def generate_report():
-    # In a real application, you'd get this data from the request
+    if not all(key in session for key in ["name", "chat", "disease1", "disease2", "disease3"]):
+        return "Error: Missing session data", 400
+
     patient_info = {
         "Name": session.get("name"),
-        "Age": "45",
-        "Gender": "Male",
-        "Patient ID": "123456"
+        "Age": session.get("age", "N/A"),
+        "Gender": session.get("gender", "N/A"),
+        "Patient ID": session.get("patient_id", "N/A")
     }
-
+    
     conversation = session["chat"]
+    symptoms = [session["disease1"], session["disease2"], session["disease3"]]
 
     # Create a BytesIO object to store the PDF
     pdf_buffer = io.BytesIO()
 
-    # Generate the report
-    generate_conversation_report(pdf_buffer, patient_info, conversation, [session["disease1"], session["disease2"], session["disease3"]])
+    try:
+        # Generate the report
+        generate_conversation_report(pdf_buffer, patient_info, conversation, symptoms)
+        
+        # Move the buffer's cursor to the beginning
+        pdf_buffer.seek(0)
+        
+        # Create a response object
+        response = make_response(pdf_buffer.getvalue())
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = 'attachment; filename=medical_report.pdf'
+        
+        return response
 
-    # Move the buffer's cursor to the beginning
-    pdf_buffer.seek(0)
-
-    # Send the file
-    return send_file(
-        pdf_buffer,
-        mimetype='application/pdf',
-        as_attachment=True,
-        download_name='medical_report.pdf'
-    )
-
-
+    except Exception as e:
+        # Log the error for debugging
+        app.logger.error(f"Error generating report: {str(e)}")
+        return "Error generating report", 500
+    finally:
+        # Ensure the buffer is closed
+        pdf_buffer.close()
 if __name__ == "__main__":
     app.run(debug=True)

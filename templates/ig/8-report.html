@@ -38,6 +38,23 @@
             border-radius: 5px;
             background-color: #e9ecef;
         }
+        .chat-button {
+        display: block;
+        width: 200px;
+        margin: 20px auto;
+        padding: 10px;
+        background-color: #4CAF50;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        font-size: 16px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+    .chat-button:hover {
+        background-color: #45a049;
+    }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -62,7 +79,9 @@
         <p>A mere nnyocha a site na ịtụle mgbaàmà ndị ọrịa, ya na mgbaàmà ndị dị n'ime data anyị, wee tulee ya megide nnyocha ọgwụgwọ gara aga nke ndị ọrịa nwere otu mgbaàmà, nke otu na nke ọgbọ otu.</p>
     </div>
 </div>
-
+<div class="chat-button-container">
+    <a href="/en/chat" class="chat-button">Gaa na Mkparịta Ụka</a>
+</div>
 <script>
     const ctx = document.getElementById('diagnosisChart').getContext('2d');
     const disease1 = document.getElementById("disease1").textContent;
